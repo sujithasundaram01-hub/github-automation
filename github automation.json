@@ -1,0 +1,192 @@
+{
+  "name": "github automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -432,
+        -64
+      ],
+      "id": "98a2e6ee-4e28-41af-9e00-3861c3804133",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are my daily GitHub learning content creator.\n\nGenerate a fresh, unique programming or technology learning update for my GitHub portfolio every day.\n\nRules:\n1. Choose a different topic for each new execution.\n2. Do not repeat topics or content from previous learning updates.\n3. Cover topics such as Python, C, Java, HTML, CSS, JavaScript, SQL, Git, GitHub, DSA, AI, and automation.\n4. Include a topic title, simple explanation, key learning points, a practical code example when relevant, and one practice task.\n5. Make the content beginner-friendly, professional, accurate, and useful for placement preparation.\n6. Return only valid Markdown content.\n7. Avoid generic filler and make each update genuinely useful.\n\nBefore generating content, use any previously supplied topic history to avoid duplicates. If no history is available, choose a new topic for this execution.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "2bc5666c-b15f-445d-95cd-77cc2315b7af",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        160
+      ],
+      "id": "c975f977-f38d-4a8a-b7b5-041dc466bc41",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WB4bOTqkMPKtrAd0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -64
+      ],
+      "id": "36bb9642-2479-4c85-93d1-ee1a7c6dd93c",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "sujithasundaram01-hub",
+          "mode": "list",
+          "cachedResultName": "sujithasundaram01-hub",
+          "cachedResultUrl": "https://github.com/sujithasundaram01-hub"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "learning-lags",
+          "mode": "list",
+          "cachedResultName": "learning-lags",
+          "cachedResultUrl": "https://github.com/sujithasundaram01-hub/learning-lags"
+        },
+        "filePath": "=learning-logs/{{ $now.toFormat('yyyy-MM-dd-HH-mm-ss') }}.md",
+        "fileContent": "={{ $json.output }}",
+        "commitMessage": "=Daily learning update - {{ $now.toFormat('yyyy-MM-dd') }} "
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        -64
+      ],
+      "id": "c78206a2-b355-476b-855c-e32229bce727",
+      "name": "Create a file",
+      "webhookId": "188beaa3-b315-49a1-885e-19697976686f",
+      "credentials": {
+        "githubApi": {
+          "id": "fZ58iERKmODOdTqh",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "bb3b87d7-c458-46ee-a884-199719afa466",
+      "name": "Remove Duplicates"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a0370fec-f351-4151-b403-dbc6193be91c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8cdaa76c4fb7a4f904f10ab908d6e9cd7340e25a55e1fd2f7180c2a5f0baca4f"
+  },
+  "nodeGroups": [],
+  "id": "qH97GHeuwiHSuJkg",
+  "tags": []
+}
